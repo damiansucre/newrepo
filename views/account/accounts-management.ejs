@@ -1,0 +1,33 @@
+<section>
+    <% if (title /*&& locals.accountsData.account_type !== 'Admin'*/) { %>
+        <h1><%= title %></h1>
+    
+      <% } else {
+          res.redirect('/')
+        } %>
+        <%- messages() %>
+        <% if (errors) { %>
+    
+        <ul class="notice">
+        <% errors.array().forEach(error => { %>
+        <li><%= error.msg %></li>
+        <%  }) %>
+        </ul>
+        <% } %>
+      
+      <div class="select-space">
+        <p>Choose an account to modify their properties:</p>
+      </div>
+      <div class="select-space">
+        <%- accountsSelect  %>
+      </div>
+    
+      <div id="accountTypeForm"></div>
+    
+    
+      <div id="accountDeleteForm"></div>
+    
+      <noscript>JavaScript must be enabled to use this page.</noscript>
+    </section>
+    
+    <script src="../../js/account.js"></script>

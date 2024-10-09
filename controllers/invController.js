@@ -32,4 +32,17 @@ invCont.buildByDetails= async function (req, res, next) {
   })
 }
 
+invCont.buildInventory = async function(req, res){
+  const inv_id = req.params.inv_id
+  const data = await invModel.getCarDetails(inv_id)
+  let nav = await utilities.getNav()
+  let options = await utilities.getOptions(data)
+  res.render("./inventory/add-inventory", {
+    title: "Add Vehicle",
+    nav,
+    options,
+    errors: null,
+  })
+}
+
 module.exports = invCont

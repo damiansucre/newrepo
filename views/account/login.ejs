@@ -1,0 +1,21 @@
+<section class="forms">
+    <% if (title) { %>
+        <h1><%= title %></h1>
+        <% } else {
+          res.redirect('/')
+        } %>
+    
+    <%- messages() %>
+    
+      <form class="general-form login" id="loginForm" action="/account/login" method="post">
+        <label for="account_email" >Email :</label>
+        <input id="account_email" type="email" name="account_email" placeholder="example@gmail.com" required value="<%= locals.account_email %>">
+        <label for="account_password">Password :</label>
+        <span class="form-notes"><strong>Note:</strong> Passwords must be at least 12 characters and contain at least 1 number, 1 capital letter and 1 special character</span> 
+        <input id="account_password" name="account_password" type="password" required pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{12,}$">
+        <button type="submit" class="login-btn">Login</button>
+        <span>No account? <a href="/account/registration">Sign-up</a></span>
+    </form>
+    
+    
+    </section>
