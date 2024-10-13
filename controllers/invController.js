@@ -1,6 +1,5 @@
 const invModel = require("../models/inventory-model")
 const utilities = require("../utilities/")
-
 const invCont = {}
 
 /* ***************************
@@ -16,6 +15,7 @@ invCont.buildByClassificationId = async function (req, res, next) {
     title: className + " vehicles",
     nav,
     grid,
+    errors: null,
   })
 }
 
@@ -29,6 +29,29 @@ invCont.buildByDetails= async function (req, res, next) {
     title: vehicleName + " vehicle",
     nav,
     grid,
+    errors: null,
+  })
+}
+
+invCont.buildInventoryManagement = async function(req, res){
+  const inv_id = req.params.inv_id
+  const data = await invModel.getCarDetails(inv_id)
+  let nav = await utilities.getNav()
+  const classificationSelect = await utilities.buildClassificationList(data)
+  res.render("./inventory/management", {
+    title: "Inventory Management",
+    nav,
+    errors: null,
+    classificationSelect
+  })
+}
+
+invCont.buildClassification = async function(req, res){
+  let nav = await utilities.getNav()
+  res.render("./inventory/add-classification", {
+    title: "Add New Classification",
+    nav,
+    errors: null,
   })
 }
 
@@ -44,5 +67,35 @@ invCont.buildInventory = async function(req, res){
     errors: null,
   })
 }
+
+/* ****************************************
+*  Adding a New Classification Process
+* *************************************** */
+invCont.addNewClassification = async function(req,res){
+  const { classification_name } = req.body
+
+  const classResult = await invModel.insertClassification(classification_name)
+  
+  let nav = await utilities.getNav()
+  if (classResult) {
+    req.flash(
+      "notice",
+      `Congratulations, you added ${classification_name}, to the navigation bar.`
+    )
+    res.status(201).render("inventory/management", {
+      title: "Inventory Management",
+      nav,
+      errors: null
+    })
+  } else {
+    req.flash("notice", "Sorry, the new classification name could not be added.")
+    res.status(501).render("inventory/add-classification", {
+      title: "Add New Classification",
+      nav,
+      errors: null
+    })
+  }
+}
+
 
 module.exports = invCont

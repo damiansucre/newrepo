@@ -39,8 +39,8 @@ app.use(function(req, res, next){
   next()
 })
 
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
+/* app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: true })) */ // for parsing application/x-www-form-urlencoded
 
 /* ***********************
  * View Engine and Templates
@@ -48,6 +48,10 @@ app.use(bodyParser.urlencoded({ extended: true })) // for parsing application/x-
 app.set("view engine", "ejs")
 app.use(expressLayouts)
 app.set("layout", "./layouts/layout") // not at views root
+// Inventory routes
+app.use("/inv", utilities.handleErrors(inventoryRoute))
+
+app.get("/inv", utilities.handleErrors(inventoryRoute))
 
 /* ***********************
  * Routes
@@ -58,12 +62,12 @@ app.use(static)
 app.get("/", utilities.handleErrors(baseController.buildHome))
   //res.render("index", {title: "Home"})
 
-// Inventory routes
+/* // Inventory routes
 app.get("/inv", utilities.handleErrors(inventoryRoute)) 
 
 // Detail routes
-// app.use("/inv", detailRoute);
-app.use("/inv", utilities.handleErrors(inventoryRoute))
+app.use("/inv", detailRoute);
+app.use("/inv", utilities.handleErrors(inventoryRoute)) */
 
 // Account routes week
 app.use("/account",utilities.handleErrors(accountRoute))
@@ -71,21 +75,6 @@ app.use("/account",utilities.handleErrors(accountRoute))
 // File Not Found Route - must be last route in list
 app.use(async (req, res, next) => {
   next({status: 404, message: 'Sorry, we appear to have lost that page.'})
-})
-
-/* ***********************
-* Express Error Handler
-* Place after all other middleware
-*************************/
-app.use(async (err, req, res, next) => {
-  let nav = await utilities.getNav()
-  console.error(`Error at: "${req.originalUrl}": ${err.message}`)
-  if(err.status == 404){ message = err.message} else {message = 'Oh no! There was a crash. Maybe try a different route?'}
-  res.render("errors/error", {
-    title: err.status || 'Server Error',
-    message: err.message,
-    nav
-  })
 })
 
 /* ***********************
@@ -100,4 +89,20 @@ const host = process.env.HOST
  *************************/
 app.listen(port, () => {
   console.log(`app listening on ${host}:${port}`)
+})
+
+/* ***********************
+* Express Error Handler
+* Place after all other middleware
+*************************/
+app.use(async (err, req, res, next) => {
+  let nav = await utilities.getNav()
+  console.error(`Error at: "${req.originalUrl}": ${err.message}`)
+  if(err.status == 404){ message = err.message} else {message = 'Oh no! There was a crash. Maybe try a different route?'}
+  res.render("errors/error", {
+    title: err.status || 'Server Error',
+    message,
+    nav,
+    errors: null,
+  })
 })
