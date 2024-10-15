@@ -34,3 +34,4 @@ validate.classificationRules = () => {
         }
         next()
       }
+      module.exports = validate

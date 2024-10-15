@@ -1,0 +1,37 @@
+<section class="account-menu">
+    <% if (title) { %>
+      <h1><%= title %></h1>
+  
+    <% } else {
+        res.redirect('/')
+      } %>
+          
+          <%- messages() %>
+          <% if (errors) { %>
+            <ul class="notice">
+           <% errors.array().forEach(error => { %>
+             <li><%= error.msg %></li>
+          <%  }) %>
+           </ul>
+          <% } %>
+  
+    <div>
+      <h2>Welcome <%= locals.accountData.account_firstname %></h2>
+      <h3>You're logged in</h3>
+    </div>
+    
+    <div class="account-submenu">
+    <h4>Edit Account</h4>
+    <p><a href="/account/update/<%-locals.accountData.account_id%>"> Edit account Information</a></p>
+  
+      <% if (locals.accountData.account_type !=='Client') { %>
+        <h4>Inventory Management</h4>
+        <p><a href="/inv">Inventory Management</a></p>
+      <% } %>
+  
+      <% if (locals.accountData.account_type =='Admin') { %>
+      <h4>User Management</h4>
+      <p><a href="/account/accounts-management">User Management</a></p>
+      <% } %>
+    </div>
+  </section>

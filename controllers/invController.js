@@ -97,5 +97,33 @@ invCont.addNewClassification = async function(req,res){
   }
 }
 
+/* ****************************************
+*  Adding Inventory Process
+* *************************************** */
+invCont.addNewVehicle= async function(req,res){
+  const { inv_make, inv_model, inv_year, inv_description, inv_image,inv_thumbnail,inv_price,inv_miles,inv_color,classification_id } = req.body
+  const vehicleResult = await invModel.insertInventory(inv_make, inv_model, inv_year, inv_description, inv_image,inv_thumbnail,inv_price,inv_miles,inv_color,classification_id)
+  let nav = await utilities.getNav()
+
+  if (vehicleResult) {
+    req.flash(
+      "notice",
+      'Congratulations, you added a new vehicle.'
+    )
+    res.status(201).render("inventory/management", {
+      title: "Inventory Management",
+      nav,
+      errors: null
+    })
+  } else {
+    req.flash("notice", "Sorry, the new classification name could not be added.")
+    res.status(501).render("inventory/add-inventory", {
+      title: "Add New Vehicle",
+      nav,
+      options,
+      errors: null
+    })
+  }
+}
 
 module.exports = invCont

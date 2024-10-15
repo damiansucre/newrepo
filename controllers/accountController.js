@@ -4,6 +4,7 @@
 const utilities = require("../utilities/")
 const accountModel= require('../models/account-model.js')
 const bcrypt = require("bcryptjs")
+const jwt = require("jsonwebtoken")//new code
 require("dotenv").config()
 
 
@@ -31,14 +32,14 @@ async function buildRegister(req, res, next) {
     })
   }
 
-  async function buildLoginManagement (req, res, next) {
+  /* async function buildLoginManagement (req, res, next) {
     let nav = await utilities.getNav()
     res.render("account/login-management", {
       title: "Account Management View",
       nav,
       errors:null
     })
-  }
+  } */
 
   /* ****************************************
 *  Process Registration

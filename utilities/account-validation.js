@@ -1,4 +1,5 @@
 const utilities = require(".")
+const bcrypt = require('bcryptjs');
 const { body, validationResult } = require("express-validator")
 const validate = {}
 const accountModel = require("../models/account-model")
@@ -95,13 +96,13 @@ validate.checkRegData = async (req, res, next) => {
       minSymbols: 1,
   })
   .withMessage('Password does not meet requirements.')
-  .custom(async (account_password, { req }) => {
+  /* .custom(async (account_password, { req }) => {
       const retrievedPasswordHash = await accountModel.checkPassword(req.body.account_email);
       const isMatch = await bcrypt.compare(account_password, retrievedPasswordHash);
       if (!isMatch) {
           throw new Error('Sorry, wrong password');
       }
-  }),
+  }), */
 ]
 }
 

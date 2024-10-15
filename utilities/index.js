@@ -1,4 +1,6 @@
 const invModel = require("../models/inventory-model")
+const jwt = require("jsonwebtoken")
+require("dotenv").config()
 const Util = {}
 
 /* ************************
@@ -84,69 +86,30 @@ Util.buildCarDetails = async function(data){
   return info
 }
 
-/* **************************************
- * Build the detail view HTML
- * ************************************ */
-/* Util.buildDetailGrid = async function (data) {
-  let grid = "";
-  if (data !== undefined && data.length > 0) {
-    grid += '<div class="detail-grid">';
-    data.forEach((vehicle) => {
-      grid += '<div class="detail-item">';
-      grid += '<div class="image-container">';
-      grid +=
-        '<img src="' +
-        vehicle.inv_image +
-        '" alt="Image of ' +
-        vehicle.inv_make +
-        " " +
-        vehicle.inv_model +
-        ' on CSE Motors" />';
-      grid += "</div>";
-      grid += '<div class="details-container">';
-      grid += "<h2>" + vehicle.inv_make + " " + vehicle.inv_model + "</h2>";
-      grid +=
-        '<p class="price"><strong> Price: $' +
-        new Intl.NumberFormat("en-US").format(vehicle.inv_price) +
-        "</strong></p>";
-      grid +=
-        '<p class="description"><strong>Description</strong>: ' +
-        vehicle.inv_description +
-        "</p>";
-      grid +=
-        '<p class="miles"><strong>Color:</strong> ' +
-        vehicle.inv_color +
-        "</p>";
-      grid +=
-        '<p class="miles"><strong>Miles:</strong> ' +
-        new Intl.NumberFormat("en-US").format(vehicle.inv_miles) +
-        "</p>";
+Util.getOptions = async function(classification_id){
+  let data = await invModel.getClassifications();
+  let option = '<select name="classification_id" id="classification_id" required>';
+  option += '<option value="">Select a Vehicle Classification</option>';
+  data.rows.forEach((row) => {
+    const isSelected = Number(row.classification_id) === Number(classification_id) ? 'selected' : '';
+    option += `<option value="${row.classification_id}" ${isSelected}>${row.classification_name}</option>`;
+  });
 
-      if (vehicle.inv_model === "DeLorean") {
-        grid +=
-          '<a class="cta-button" href="/own/special/' +
-          vehicle.inv_id +
-          '" title="View special DeLorean details"><button>Special DeLorean!</button></a>';
-      } else {
-        grid +=
-          '<a class="cta-button" href="/own/own-today/' +
-          vehicle.inv_id +
-          '" title="View ' +
-          vehicle.inv_make +
-          " " +
-          vehicle.inv_model +
-          ' details"><button>Buy now!</button></a>';
-      }
+  option += '</select>';
+  return option;
+};
 
-      grid += "</div>";
-      grid += "</div>";
-    });
-    grid += "</div>";
-  } else {
-    grid += '<p class="notice">Sorry, no matching vehicles could be found.</p>';
+Util.buildClassificationList = async function(classification_id){
+  let data = await invModel.getClassifications()
+  let option = '<select name="classification_id" id="classificationList" required>';
+  option += '<option value="">Select a Vehicle Classification</option>';
+  data.rows.forEach((row) => {
+    const isSelected = Number(row.classification_id) === Number(classification_id) ? 'selected' : '';
+  option += `<option value="${row.classification_id}" ${isSelected}>${row.classification_name}</option>`;
+  });
+    option += '</select>';
+    return option
   }
-  return grid;
-}; */
 
  /* ****************************************
  *  Check Login
@@ -157,6 +120,49 @@ Util.buildCarDetails = async function(data){
   } else {
     req.flash("notice", "Please log in.")
     return res.redirect("/account/login")
+  }
+ }
+
+ Util.accountTypeCheck = (req, res, next) => {
+  const account_type =res.locals.accountData.account_type
+    if (account_type == 'Employee' || account_type == 'Admin') {
+      next()
+    } else {
+      req.flash("notice", "Sorry, you're account type does not have the rights to access here")
+      return res.redirect("/account/")
+    }
+ }
+
+ Util.accountTypeCheckAdmin = (req, res, next) => {
+  const account_type =res.locals.accountData.account_type
+    if (account_type == 'Admin') {
+      next()
+    } else {
+      req.flash("notice", "Sorry, you're account type does not have the rights to access here")
+      return res.redirect("/account/")
+    }
+ }
+
+ /* ****************************************
+* Middleware to check token validity
+**************************************** */
+Util.checkJWTToken = (req, res, next) => {
+  if (req.cookies.jwt) {
+   jwt.verify(
+    req.cookies.jwt,
+    process.env.ACCESS_TOKEN_SECRET,
+    function (err, accountData) {
+     if (err) {
+      req.flash("Please log in")
+      res.clearCookie("jwt")
+      return res.redirect("/account/login")
+     }
+     res.locals.accountData = accountData
+     res.locals.loggedin = 1
+     next()
+    })
+  } else {
+   next()
   }
  }
 

@@ -7,6 +7,7 @@ const router = new express.Router()
 const regValidate = require('../utilities/account-validation')
 const utilities = require("../utilities/")
 const accountController = require("../controllers/accountController")
+const { check } = require("express-validator");
 
 /* *******************************
 * Deliver Login View
@@ -27,14 +28,14 @@ router.post(
     utilities.handleErrors(accountController.registerAccount)
   )
 
-router.get('/', utilities.checkLogin, utilities.handleErrors(accountController.buildLoginManagement))
-  
-// Process the login attempt
+// week 4 Process the login attempt
 router.post(
-  '/login',
+  "/login",
   regValidate.loginRules(),
   regValidate.checkLogData,
   utilities.handleErrors(accountController.accountLogin)
 )
+
+router.get('/', utilities.checkLogin, utilities.handleErrors(accountController.buildLoginManagement))
 
 module.exports = router

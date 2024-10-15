@@ -6,17 +6,20 @@
  * Require Statements
  *************************/
 const express = require("express")
-const expressLayouts = require("express-ejs-layouts")
 const env = require("dotenv").config()
 const app = express()
-const static = require("./routes/static")
-const baseController = require("./controllers/baseController")
-const inventoryRoute = require("./routes/inventoryRoute")
 const session = require("express-session")
 const pool = require('./database/')
-const utilities = require("./utilities/")
+const static = require("./routes/static")
+const expressLayouts = require("express-ejs-layouts")
 const accountRoute = require('./routes/accountRoute')
+const inventoryRoute = require("./routes/inventoryRoute")
+const baseController = require("./controllers/baseController")
 const bodyParser = require("body-parser")
+const cookieParser = require("cookie-parser")
+const utilities = require("./utilities/")
+
+app.use(static)
 
 /* ***********************
  * Middleware
@@ -39,38 +42,37 @@ app.use(function(req, res, next){
   next()
 })
 
-/* app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({ extended: true })) */ // for parsing application/x-www-form-urlencoded
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
+// Week 5, Login activity
+app.use(cookieParser())
+app.use(utilities.checkJWTToken)
 
 /* ***********************
  * View Engine and Templates
  *************************/
+app.use(static)
 app.set("view engine", "ejs")
 app.use(expressLayouts)
 app.set("layout", "./layouts/layout") // not at views root
+
 // Inventory routes
 app.use("/inv", utilities.handleErrors(inventoryRoute))
-
 app.get("/inv", utilities.handleErrors(inventoryRoute))
 
 /* ***********************
  * Routes
  *************************/
-app.use(static)
+// Account routes week
+app.use("/account",utilities.handleErrors(accountRoute))
 
 //Index route
 app.get("/", utilities.handleErrors(baseController.buildHome))
   //res.render("index", {title: "Home"})
 
-/* // Inventory routes
-app.get("/inv", utilities.handleErrors(inventoryRoute)) 
-
 // Detail routes
-app.use("/inv", detailRoute);
+/* app.use("/inv", detailRoute);
 app.use("/inv", utilities.handleErrors(inventoryRoute)) */
-
-// Account routes week
-app.use("/account",utilities.handleErrors(accountRoute))
 
 // File Not Found Route - must be last route in list
 app.use(async (req, res, next) => {
