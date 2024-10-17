@@ -298,6 +298,21 @@ form.login span a:hover{
   background-image: none;
 }
 
+/*Inventory Management*/
+.vehicle-table{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient( #307bca, #2db9e8);
+  /*border: solid 1px rgba(255, 255, 255, 0.2);*/
+}
+table{
+  color: white;
+  font-size: 14px;
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+
 footer{
   padding: 0 20px;
 }

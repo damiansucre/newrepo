@@ -26,16 +26,27 @@ utilities.accountTypeCheck,
 invValidate.checkClassificationData,
 utilities.handleErrors(invController.addNewClassification))
 
-router.get("/add-classification",
-    utilities.checkLogin,utilities.accountTypeCheck, utilities.handleErrors(invController.buildClassification));
+/* router.get("/add-classification",
+    utilities.checkLogin,utilities.accountTypeCheck, utilities.handleErrors(invController.buildClassification)); */
     
-    router.post('/add-classification',
+router.post('/add-classification',
     invValidate.classificationRules(),
     utilities.checkLogin,
     utilities.accountTypeCheck,
     invValidate.checkClassificationData,
     utilities.handleErrors(invController.addNewClassification))
 
-// router.get("/getInventory/:classification_id", utilities.handleErrors(invController.getInventoryJSON));
+router.get("/getInventory/:classification_id", utilities.handleErrors(invController.getInventoryJSON));
+
+/* Route to Edit Vehicles */
+router.get("/edit/:inv_id", utilities.accountTypeCheck, utilities.handleErrors(invController.editInventory));
+
+/*Route to edit*/
+router.post("/update/", 
+    invValidate.vehicleRules(),
+    utilities.checkLogin,
+    utilities.accountTypeCheck,
+    invValidate.checkUpdateData,
+    utilities.handleErrors(invController.updateInventory))
 
 module.exports = router;
