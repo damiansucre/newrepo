@@ -18,9 +18,9 @@ validate.classificationRules = () => {
           }
         })
       ]}
-      validate.checkClassificationData = async (req, res, next) => {
-        const { classification_name } = req.body
-        let errors = []
+validate.checkClassificationData = async (req, res, next) => {
+  const { classification_name } = req.body
+    let errors = []
         errors = validationResult(req)
         if (!errors.isEmpty()) {
           let nav = await utilities.getNav()

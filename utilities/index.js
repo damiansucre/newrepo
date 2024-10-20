@@ -1,4 +1,5 @@
 const invModel = require("../models/inventory-model")
+const accModel = require("../models/account-model")
 const jwt = require("jsonwebtoken")
 require("dotenv").config()
 const Util = {}
@@ -67,8 +68,6 @@ Util.buildCarDetails = async function(data){
   if(data.length > 0){
     info = '<div id="inv-details">'
     data.forEach(vehicle => { 
-      // info += `<h1>${vehicle.inv_year} ${vehicle.inv_make}  ${vehicle.inv_model}</h1>`
-      
       info +=  '<img src="' + vehicle.inv_image 
       +'" alt="Image of '+ vehicle.inv_make + ' ' + vehicle.inv_model +'" title="'+vehicle.inv_make + ' '+ vehicle.inv_model+'">'
       info+='<h2>Details:</h2>'
@@ -94,7 +93,6 @@ Util.getOptions = async function(classification_id){
     const isSelected = Number(row.classification_id) === Number(classification_id) ? 'selected' : '';
     option += `<option value="${row.classification_id}" ${isSelected}>${row.classification_name}</option>`;
   });
-
   option += '</select>';
   return option;
 };
@@ -110,6 +108,29 @@ Util.buildClassificationList = async function(classification_id){
     option += '</select>';
     return option
   }
+
+  /* ****************************************
+* Middleware to check token validity
+**************************************** */
+Util.checkJWTToken = (req, res, next) => {
+  if (req.cookies.jwt) {
+   jwt.verify(
+    req.cookies.jwt,
+    process.env.ACCESS_TOKEN_SECRET,
+    function (err, accountData) {
+     if (err) {
+      req.flash("Please log in")
+      res.clearCookie("jwt")
+      return res.redirect("/account/login")
+     }
+     res.locals.accountData = accountData
+     res.locals.loggedin = 1
+     next()
+    })
+  } else {
+   next()
+  }
+ }
 
  /* ****************************************
  *  Check Login
@@ -146,7 +167,7 @@ Util.buildClassificationList = async function(classification_id){
  /* ****************************************
 * Middleware to check token validity
 **************************************** */
-Util.checkJWTToken = (req, res, next) => {
+/* Util.checkJWTToken = (req, res, next) => {
   if (req.cookies.jwt) {
    jwt.verify(
     req.cookies.jwt,
@@ -165,7 +186,43 @@ Util.checkJWTToken = (req, res, next) => {
    next()
   }
  }
+ */
 
+ /* ****************************************
+ *  Log out
+ * ************************************ */
+ Util.logout = (req, res, next) => {
+  res.clearCookie('jwt'); 
+  return res.redirect('/')
+ }
+
+ /* ****************************************
+ *  Update account type utilities
+ * ************************************ */
+ Util.buildAccountsList = async function(account_id){
+  let data = await accModel.getAccounts()
+  let option = '<select name="account_id" id="accountList" required>';
+  option += '<option value="">Select an Account </option>';
+  data.rows.forEach((row) => {
+    const isSelected = Number(row.account_id) === Number(account_id) ? 'selected' : '';
+  option += `<option value="${row.account_id}" ${isSelected}>${row.account_firstname}  ${row.account_lastname}</option>`;
+  });
+    option += '</select>';
+    return option
+  }
+
+  Util.buildAccountTypesList = async function(account_type){
+    let data = await accModel.getAccountTypes()
+    let option = '<select name="account_type" id="account_typeList" required>';
+    option += '<option value="">Select an Account Type</option>';
+    data.rows.forEach((row) => {
+      const isSelected = Number(row.account_type) === Number(account_type) ? 'selected' : '';
+    option += `<option value="${row.account_type}" ${isSelected}>${row.account_type}</option>`;
+    });
+      option += '</select>';
+      return option
+    }
+    
 /* ****************************************
  * Middleware For Handling Errors
  * Wrap other function in this for 

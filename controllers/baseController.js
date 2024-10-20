@@ -7,4 +7,10 @@ const baseController = {}
   // req.flash("notice", "This is a flash message.")
 }
 
+baseController.buildHome2 = async function(req, res){
+  const errors =(req, res) => {res.status(500).send('Error Message')}
+  res.render("index", {title: "Home", nav, errors})
+  // Process the login attempt
+}
+
 module.exports = baseController
